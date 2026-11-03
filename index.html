@@ -1,0 +1,1599 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Frontend Mentor | E-commerce Product Page</title>
+
+  <!-- Google Fonts: Kumbh Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            kumbh: ['"Kumbh Sans"', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ==========================================
+       GLOBAL STYLES
+    ========================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Kumbh Sans', sans-serif;
+      min-height: 100vh;
+      min-height: 100svh;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    /* ==========================================
+       PAGE LAYOUT
+       The page can grow naturally when content
+       needs more height, especially on mobile.
+    ========================================== */
+
+    .page-wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+    }
+
+    .site-header,
+    .site-footer {
+      flex-shrink: 0;
+    }
+
+    .site-main {
+      flex: 1 0 auto;
+      min-width: 0;
+      width: 100%;
+    }
+
+    /* ==========================================
+       DESKTOP NAVIGATION
+    ========================================== */
+
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #ff7d1a;
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -30px;
+      width: 0;
+      height: 4px;
+      background-color: #ff7d1a;
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* ==========================================
+       MOBILE NAVIGATION DRAWER
+    ========================================== */
+
+    #mobile-drawer {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    #mobile-drawer.open {
+      transform: translateX(0);
+    }
+
+    #mobile-overlay {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+    }
+
+    #mobile-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* ==========================================
+       PRODUCT GALLERY
+    ========================================== */
+
+    .product-gallery {
+      width: min(100%, 500px, calc((100svh - 210px) / 1.25));
+      margin-inline: auto;
+      min-width: 0;
+    }
+
+    .main-product-image {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    /* Gallery thumbnail buttons */
+    .thumbnail {
+      position: relative;
+      display: block;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      transition: border-color 0.2s ease;
+    }
+
+    .thumbnail img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Active thumbnail orange border */
+    .thumbnail.active {
+      border-color: #ff7d1a;
+    }
+
+    /* Pale overlay for active and hovered thumbnails */
+    .thumbnail::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0);
+      pointer-events: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .thumbnail.active::after {
+      background: rgba(255, 255, 255, 0.65);
+    }
+
+    .thumbnail:hover:not(.active)::after {
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .thumbnail:focus-visible {
+      outline: 3px solid #ff7d1a;
+      outline-offset: 3px;
+    }
+
+    /* ==========================================
+       SHOPPING CART POPUP
+    ========================================== */
+
+    #cart-popup {
+      position: absolute;
+      top: calc(100% + 14px);
+      right: 0;
+      width: min(360px, calc(100vw - 24px));
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.22);
+      z-index: 60;
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-8px);
+
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0.2s ease;
+    }
+
+    #cart-popup.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .cart-item-image {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+
+    .cart-delete-button img {
+      width: 16px;
+      height: 18px;
+    }
+
+    /* ==========================================
+       GALLERY NAVIGATION ARROWS
+    ========================================== */
+
+    .gallery-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background-color 0.2s ease;
+    }
+
+    .gallery-arrow:hover {
+      background-color: #ff7d1a;
+    }
+
+    .gallery-arrow:hover img {
+      filter: brightness(0) invert(1);
+    }
+
+    /* ==========================================
+       DESKTOP LIGHTBOX
+    ========================================== */
+
+    #lightbox {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+    }
+
+    #lightbox.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      width: min(100%, 430px, calc((100svh - 220px) / 1.22));
+    }
+
+    .lightbox-image {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    #lightbox-close {
+      transition: transform 0.2s ease;
+    }
+
+    #lightbox-close:hover {
+      transform: scale(1.15);
+    }
+
+    /* Prevent background scrolling when a popup is open */
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    /* ==========================================
+       DESKTOP RESPONSIVE LAYOUT
+    ========================================== */
+
+    @media (min-width: 768px) {
+      .site-header nav {
+        padding-inline: clamp(24px, 4vw, 48px);
+      }
+
+      .site-main {
+        display: flex;
+        align-items: center;
+        min-height: 0;
+        padding-block: clamp(16px, 3vh, 32px);
+      }
+
+      .product-section {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: center;
+        gap: clamp(24px, 5vw, 72px);
+      }
+
+      .product-gallery {
+        max-width: 500px;
+      }
+
+      .product-details {
+        min-width: 0;
+      }
+
+      .desktop-thumbnails {
+        gap: clamp(10px, 1.5vw, 18px);
+        margin-top: clamp(14px, 2vh, 22px);
+      }
+    }
+
+    /* ==========================================
+       SMALL DESKTOP / LAPTOP SCREENS
+    ========================================== */
+
+    @media (min-width: 768px) and (max-height: 700px) {
+      .site-main {
+        padding-block: 12px;
+      }
+
+      .product-gallery {
+        width: min(100%, 450px, calc((100svh - 180px) / 1.25));
+      }
+
+      .desktop-thumbnails {
+        margin-top: 12px;
+      }
+
+      .product-details .company-name {
+        margin-bottom: 12px;
+      }
+
+      .product-details h1 {
+        font-size: clamp(28px, 3vw, 40px);
+        line-height: 1.12;
+        margin-bottom: 16px;
+      }
+
+      .product-details .description {
+        margin-bottom: 18px;
+      }
+
+      .product-details .price-section {
+        margin-bottom: 18px;
+      }
+    }
+
+    /* ==========================================
+       MOBILE RESPONSIVE LAYOUT
+    ========================================== */
+
+    @media (max-width: 767px) {
+      html,
+      body {
+        width: 100%;
+        overflow-x: hidden;
+      }
+
+      /* Allow the page to expand beyond the screen height */
+      .page-wrapper {
+        min-height: 100vh;
+        min-height: 100svh;
+        height: auto;
+      }
+
+      /* Mobile header */
+      .site-header nav {
+        padding-inline: 20px;
+      }
+
+      .site-header nav > div {
+        height: 68px;
+      }
+
+      /* Reset desktop flex layout */
+      .site-main {
+        display: block;
+        flex: 1 0 auto;
+        min-height: auto;
+        width: 100%;
+        padding: 0;
+      }
+
+      /* Stack gallery and product information vertically */
+      .product-section {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+      }
+
+      /* Make gallery use the full mobile width */
+      .product-gallery {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+      }
+
+      /* Shorter responsive image to reduce unnecessary vertical space */
+      .main-product-image {
+        width: 100%;
+        height: clamp(230px, 75vw, 340px);
+        aspect-ratio: auto;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 0;
+      }
+
+      .mobile-gallery {
+        width: 100%;
+        touch-action: pan-y;
+      }
+
+      .mobile-gallery button#main-image-button {
+        display: block;
+        width: 100%;
+      }
+
+      /* Mobile gallery arrows */
+      .gallery-arrow {
+        width: 42px;
+        height: 42px;
+      }
+
+      /* Hide desktop thumbnail row on mobile */
+      .desktop-thumbnails {
+        display: none !important;
+      }
+
+      /* Product information spacing */
+      .product-details {
+        width: 100%;
+        min-width: 0;
+        padding: 24px 24px 36px;
+      }
+
+      .product-details .company-name {
+        font-size: 12px;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
+      }
+
+      .product-details h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        line-height: 1.12;
+        margin-bottom: 16px;
+      }
+
+      .product-details .description {
+        font-size: 15px;
+        line-height: 1.65;
+        margin-bottom: 20px;
+      }
+
+      /* Price information */
+      .product-details .price-section {
+        margin-bottom: 20px;
+      }
+
+      .product-details .price-section > div > span:first-child {
+        font-size: 28px;
+      }
+
+      .product-details .price-section > span:last-child {
+        margin-top: 0;
+      }
+
+      /* Quantity and add-to-cart controls */
+      .product-details > div:last-child {
+        gap: 12px;
+      }
+
+      .product-details #quantity-minus,
+      .product-details #quantity-plus {
+        padding-inline: 8px;
+      }
+
+      .product-details #add-to-cart {
+        min-height: 54px;
+      }
+
+      /* Footer stays in normal document flow */
+      .site-footer {
+        padding: 18px 12px;
+        line-height: 1.8;
+      }
+
+      /* Mobile cart popup */
+      #cart-popup {
+        position: fixed;
+        top: 78px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: 420px;
+        max-height: calc(100svh - 92px);
+        margin-inline: auto;
+        overflow-y: auto;
+      }
+
+      /* Lightbox sizing */
+      .lightbox-content {
+        width: min(100%, 430px);
+      }
+    }
+
+    /* ==========================================
+       VERY SMALL PHONES
+    ========================================== */
+
+    @media (max-width: 360px) {
+      .site-header nav {
+        padding-inline: 14px;
+      }
+
+      .site-header nav > div {
+        height: 64px;
+      }
+
+      .site-header nav img[alt="Sneaker Company"] {
+        width: 118px;
+      }
+
+      .site-header nav > div > div:last-child {
+        gap: 16px;
+      }
+
+      .product-details {
+        padding: 22px 18px 30px;
+      }
+
+      .product-details h1 {
+        font-size: 27px;
+      }
+
+      .product-details .description {
+        font-size: 14px;
+      }
+
+      .product-details .price-section > div > span:first-child {
+        font-size: 26px;
+      }
+
+      .gallery-arrow {
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    /* ==========================================
+       ACCESSIBILITY
+    ========================================== */
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid #ff7d1a;
+      outline-offset: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white">
+
+  <div class="page-wrapper">
+
+    <!-- ========================================
+         HEADER AND DESKTOP NAVIGATION
+    ========================================= -->
+
+    <header class="site-header bg-white relative z-30">
+      <nav class="max-w-7xl mx-auto px-6 lg:px-10">
+        <div class="flex items-center justify-between h-20 border-b border-gray-200">
+
+          <div class="flex items-center gap-6 md:gap-10 lg:gap-14">
+
+            <!-- Mobile menu button -->
+            <button
+              id="menu-open"
+              type="button"
+              aria-label="Open navigation menu"
+              aria-controls="mobile-drawer"
+              aria-expanded="false"
+              class="md:hidden flex items-center justify-center"
+            >
+              <img src="./images/icon-menu.svg" alt="" class="w-5 h-5">
+            </button>
+
+            <!-- Company logo -->
+            <a href="#" class="flex-shrink-0">
+              <img
+                src="./images/logo.svg"
+                alt="Sneaker Company"
+                class="w-36"
+              >
+            </a>
+
+            <!-- Desktop navigation links -->
+            <ul class="hidden md:flex items-center gap-5 lg:gap-8 h-20">
+              <li><a href="#" class="nav-link text-gray-500">Collections</a></li>
+              <li><a href="#" class="nav-link text-gray-500">Men</a></li>
+              <li><a href="#" class="nav-link text-gray-500">Women</a></li>
+              <li><a href="#" class="nav-link text-gray-500">About</a></li>
+              <li><a href="#" class="nav-link text-gray-500">Contact</a></li>
+            </ul>
+
+          </div>
+
+          <!-- Cart and user avatar -->
+          <div class="flex items-center gap-6 md:gap-8">
+
+            <div id="cart-container" class="relative">
+
+              <!-- Cart toggle button -->
+              <button
+                id="cart-toggle"
+                type="button"
+                aria-label="Open shopping cart"
+                aria-controls="cart-popup"
+                aria-expanded="false"
+                class="relative hover:opacity-70 transition"
+              >
+                <img src="./images/icon-cart.svg" alt="" class="w-6 h-6">
+
+                <!-- Cart quantity badge -->
+                <span
+                  id="cart-count"
+                  class="hidden absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-orange-500 text-white text-xs font-bold items-center justify-center"
+                  aria-live="polite"
+                >0</span>
+              </button>
+
+              <!-- Shopping cart popup -->
+              <section
+                id="cart-popup"
+                aria-label="Shopping cart"
+                aria-hidden="true"
+              >
+                <h2 class="px-6 py-5 text-gray-900 font-bold">Cart</h2>
+
+                <div class="h-px bg-gray-200"></div>
+
+                <div
+                  id="cart-content"
+                  class="p-6 min-h-40 flex flex-col justify-center"
+                >
+
+                  <!-- Empty cart message -->
+                  <p
+                    id="cart-empty"
+                    class="text-gray-500 font-bold text-center"
+                  >
+                    Your cart is empty.
+                  </p>
+
+                  <!-- Cart product details -->
+                  <div id="cart-filled" class="hidden">
+
+                    <div class="flex items-center gap-4">
+
+                      <img
+                        src="./images/image-product-1.jpg"
+                        alt="Fall Limited Edition Sneakers"
+                        class="cart-item-image"
+                      >
+
+                      <div class="min-w-0 flex-1 text-sm text-gray-500">
+                        <p class="truncate">Fall Limited Edition Sneakers</p>
+
+                        <p class="mt-1">
+                          $125.00 ×
+                          <span id="cart-item-quantity">0</span>
+
+                          <strong
+                            id="cart-item-total"
+                            class="ml-1 text-gray-900"
+                          >$0.00</strong>
+                        </p>
+                      </div>
+
+                      <!-- Remove product from cart -->
+                      <button
+                        id="cart-delete"
+                        type="button"
+                        class="cart-delete-button p-2 hover:opacity-60"
+                        aria-label="Remove product from cart"
+                      >
+                        <img src="./images/icon-delete.svg" alt="">
+                      </button>
+
+                    </div>
+
+                    <!-- Checkout button -->
+                    <button
+                      id="checkout-button"
+                      type="button"
+                      class="mt-6 w-full rounded-lg bg-orange-500 hover:bg-orange-400 py-4 font-bold text-black transition"
+                    >
+                      Checkout
+                    </button>
+
+                  </div>
+                </div>
+              </section>
+
+            </div>
+
+            <!-- User avatar -->
+            <button
+              type="button"
+              aria-label="User profile"
+              class="rounded-full border-2 border-orange-500 hover:border-orange-600 transition"
+            >
+              <img
+                src="./images/image-avatar.png"
+                alt="User avatar"
+                class="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover"
+              >
+            </button>
+
+          </div>
+        </div>
+      </nav>
+    </header>
+
+
+    <!-- ========================================
+         MOBILE NAVIGATION OVERLAY
+    ========================================= -->
+
+    <div
+      id="mobile-overlay"
+      class="fixed inset-0 bg-black/60 z-40 md:hidden"
+      aria-hidden="true"
+    ></div>
+
+
+    <!-- ========================================
+         MOBILE NAVIGATION DRAWER
+    ========================================= -->
+
+    <aside
+      id="mobile-drawer"
+      class="fixed top-0 left-0 h-full w-72 max-w-[80%] bg-white z-50 p-7 shadow-xl md:hidden"
+      aria-label="Mobile navigation"
+      aria-hidden="true"
+      inert
+    >
+
+      <button
+        id="menu-close"
+        type="button"
+        aria-label="Close navigation menu"
+        class="mb-12"
+      >
+        <img src="./images/icon-close.svg" alt="" class="w-5 h-5">
+      </button>
+
+      <!-- Mobile navigation links -->
+      <ul class="flex flex-col gap-7 font-bold text-lg">
+        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Collections</a></li>
+        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Men</a></li>
+        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Women</a></li>
+        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">About</a></li>
+        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Contact</a></li>
+      </ul>
+
+    </aside>
+
+
+    <!-- ========================================
+         MAIN PRODUCT SECTION
+    ========================================= -->
+
+    <main class="site-main max-w-7xl mx-auto w-full px-0 md:px-6 lg:px-10">
+
+      <section class="product-section">
+
+        <!-- PRODUCT IMAGE GALLERY -->
+        <div class="product-gallery">
+
+          <div id="mobile-gallery" class="mobile-gallery relative group">
+
+            <!-- Main product image -->
+            <button
+              id="main-image-button"
+              type="button"
+              aria-label="Open product image gallery"
+              class="block w-full md:cursor-zoom-in"
+            >
+              <img
+                id="main-product-image"
+                src="./images/image-product-1.jpg"
+                alt="Fall Limited Edition Sneakers"
+                class="main-product-image"
+              >
+            </button>
+
+            <!-- Mobile previous image button -->
+            <button
+              id="mobile-prev"
+              type="button"
+              aria-label="Previous image"
+              class="gallery-arrow left-4 md:hidden"
+            >
+              <img src="./images/icon-previous.svg" alt="" class="w-3 h-4">
+            </button>
+
+            <!-- Mobile next image button -->
+            <button
+              id="mobile-next"
+              type="button"
+              aria-label="Next image"
+              class="gallery-arrow right-4 md:hidden"
+            >
+              <img src="./images/icon-next.svg" alt="" class="w-3 h-4">
+            </button>
+
+          </div>
+
+          <!-- Desktop product thumbnails -->
+          <div
+            id="desktop-thumbnails"
+            class="desktop-thumbnails hidden md:grid grid-cols-4 gap-4 mt-5"
+          >
+
+            <button
+              type="button"
+              class="thumbnail active"
+              data-index="0"
+              aria-label="Show product image 1"
+              aria-pressed="true"
+            >
+              <img src="./images/image-product-1.jpg" alt="Sneaker thumbnail 1">
+            </button>
+
+            <button
+              type="button"
+              class="thumbnail"
+              data-index="1"
+              aria-label="Show product image 2"
+              aria-pressed="false"
+            >
+              <img src="./images/image-product-2.jpg" alt="Sneaker thumbnail 2">
+            </button>
+
+            <button
+              type="button"
+              class="thumbnail"
+              data-index="2"
+              aria-label="Show product image 3"
+              aria-pressed="false"
+            >
+              <img src="./images/image-product-3.jpg" alt="Sneaker thumbnail 3">
+            </button>
+
+            <button
+              type="button"
+              class="thumbnail"
+              data-index="3"
+              aria-label="Show product image 4"
+              aria-pressed="false"
+            >
+              <img src="./images/image-product-4.jpg" alt="Sneaker thumbnail 4">
+            </button>
+
+          </div>
+        </div>
+
+
+        <!-- PRODUCT DETAILS -->
+        <div class="product-details px-6 md:px-0 py-8 md:py-0">
+
+          <p class="company-name text-gray-500 font-bold uppercase tracking-widest text-sm mb-5">
+            Sneaker Company
+          </p>
+
+          <h1 class="text-gray-900 text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+            Fall Limited Edition Sneakers
+          </h1>
+
+          <p class="description text-gray-500 leading-relaxed mb-7">
+            These low-profile sneakers are your perfect casual wear companion.
+            Featuring a durable rubber outer sole, they’ll withstand everything
+            the weather can offer.
+          </p>
+
+          <!-- Product price and discount -->
+          <div class="price-section flex md:flex-col items-center md:items-start justify-between mb-7">
+
+            <div class="flex items-center gap-4">
+              <span class="text-3xl font-bold text-gray-900">$125.00</span>
+
+              <span class="bg-black text-white font-bold px-2 py-1 rounded-md">
+                50%
+              </span>
+            </div>
+
+            <span class="text-gray-500 line-through font-bold mt-0 md:mt-2">
+              $250.00
+            </span>
+
+          </div>
+
+          <!-- Quantity selector and add-to-cart controls -->
+          <div class="flex flex-col sm:flex-row gap-4">
+
+            <!-- Quantity selector -->
+            <div class="flex items-center justify-between bg-gray-100 rounded-xl px-4 py-4 sm:w-2/5">
+
+              <button
+                id="quantity-minus"
+                type="button"
+                aria-label="Decrease quantity"
+                class="text-orange-500 text-2xl font-bold hover:opacity-60"
+              >-</button>
+
+              <span
+                id="quantity"
+                class="font-bold text-gray-900"
+                aria-live="polite"
+              >0</span>
+
+              <button
+                id="quantity-plus"
+                type="button"
+                aria-label="Increase quantity"
+                class="text-orange-500 text-2xl font-bold hover:opacity-60"
+              >+</button>
+
+            </div>
+
+            <!-- Add-to-cart button -->
+            <button
+              id="add-to-cart"
+              type="button"
+              class="flex items-center justify-center gap-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl py-4 px-6 sm:flex-1 transition shadow-lg shadow-orange-200"
+            >
+              <img
+                src="./images/icon-cart.svg"
+                alt=""
+                class="w-5 h-5 brightness-0"
+              >
+              Add to cart
+            </button>
+
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+
+    <!-- ========================================
+         DESKTOP PRODUCT IMAGE LIGHTBOX
+    ========================================= -->
+
+    <div
+      id="lightbox"
+      class="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-6"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Product image gallery"
+      inert
+    >
+
+      <div id="lightbox-content" class="lightbox-content">
+
+        <!-- Lightbox close button -->
+        <div class="flex justify-end mb-4">
+          <button
+            id="lightbox-close"
+            type="button"
+            aria-label="Close image gallery"
+          >
+            <img
+              src="./images/icon-close.svg"
+              alt=""
+              class="w-6 h-6 brightness-0 invert"
+            >
+          </button>
+        </div>
+
+        <!-- Large lightbox image and navigation -->
+        <div class="relative">
+
+          <img
+            id="lightbox-image"
+            src="./images/image-product-1.jpg"
+            alt="Fall Limited Edition Sneakers"
+            class="lightbox-image"
+          >
+
+          <button
+            id="lightbox-prev"
+            type="button"
+            aria-label="Previous image"
+            class="gallery-arrow -left-6"
+          >
+            <img src="./images/icon-previous.svg" alt="" class="w-3 h-4">
+          </button>
+
+          <button
+            id="lightbox-next"
+            type="button"
+            aria-label="Next image"
+            class="gallery-arrow -right-6"
+          >
+            <img src="./images/icon-next.svg" alt="" class="w-3 h-4">
+          </button>
+
+        </div>
+
+        <!-- Lightbox thumbnails -->
+        <div
+          id="lightbox-thumbnails"
+          class="grid grid-cols-4 gap-4 mt-6 px-3"
+        >
+
+          <button
+            type="button"
+            class="thumbnail active"
+            data-index="0"
+            aria-label="Show product image 1"
+            aria-pressed="true"
+          >
+            <img src="./images/image-product-1.jpg" alt="Sneaker thumbnail 1">
+          </button>
+
+          <button
+            type="button"
+            class="thumbnail"
+            data-index="1"
+            aria-label="Show product image 2"
+            aria-pressed="false"
+          >
+            <img src="./images/image-product-2.jpg" alt="Sneaker thumbnail 2">
+          </button>
+
+          <button
+            type="button"
+            class="thumbnail"
+            data-index="2"
+            aria-label="Show product image 3"
+            aria-pressed="false"
+          >
+            <img src="./images/image-product-3.jpg" alt="Sneaker thumbnail 3">
+          </button>
+
+          <button
+            type="button"
+            class="thumbnail"
+            data-index="3"
+            aria-label="Show product image 4"
+            aria-pressed="false"
+          >
+            <img src="./images/image-product-4.jpg" alt="Sneaker thumbnail 4">
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         FOOTER
+    ========================================= -->
+
+    <footer class="site-footer text-center text-xs text-gray-500 py-4">
+
+      Challenge by
+
+      <a
+        href="https://www.frontendmentor.io?ref=challenge"
+        class="text-blue-600 underline hover:text-orange-500 transition"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Frontend Mentor</a>.
+
+      Coded by
+
+      <a
+        href="https://www.linkedin.com/in/heinn-htet-zan-040794291/"
+        class="text-blue-600 underline hover:text-orange-500 transition"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Heinn Htet Zan</a>.
+
+    </footer>
+
+  </div>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+       Handles navigation, gallery, quantity,
+       cart interactions, and keyboard controls.
+  =========================================== -->
+
+  <script>
+    // ==========================================
+    // MOBILE NAVIGATION DRAWER
+    // ==========================================
+
+    const menuOpen = document.getElementById("menu-open");
+    const menuClose = document.getElementById("menu-close");
+    const mobileDrawer = document.getElementById("mobile-drawer");
+    const mobileOverlay = document.getElementById("mobile-overlay");
+
+    // Check whether the mobile drawer is currently open.
+    function isMenuOpen() {
+      return mobileDrawer.classList.contains("open");
+    }
+
+    // Open the drawer and prevent background scrolling.
+    function openMenu() {
+      mobileDrawer.classList.add("open");
+      mobileOverlay.classList.add("open");
+
+      mobileDrawer.removeAttribute("inert");
+      mobileDrawer.setAttribute("aria-hidden", "false");
+
+      menuOpen.setAttribute("aria-expanded", "true");
+
+      document.body.classList.add("no-scroll");
+
+      menuClose.focus();
+    }
+
+    // Close the drawer and restore focus to the menu button.
+    function closeMenu() {
+      if (!isMenuOpen()) return;
+
+      mobileDrawer.classList.remove("open");
+      mobileOverlay.classList.remove("open");
+
+      mobileDrawer.setAttribute("inert", "");
+      mobileDrawer.setAttribute("aria-hidden", "true");
+
+      menuOpen.setAttribute("aria-expanded", "false");
+
+      document.body.classList.remove("no-scroll");
+
+      menuOpen.focus();
+    }
+
+    menuOpen.addEventListener("click", openMenu);
+    menuClose.addEventListener("click", closeMenu);
+    mobileOverlay.addEventListener("click", closeMenu);
+
+    // Close the drawer when the user clicks outside it.
+    document.addEventListener("click", (event) => {
+      if (!isMenuOpen()) return;
+
+      const clickedInsideDrawer = mobileDrawer.contains(event.target);
+      const clickedOpenButton = menuOpen.contains(event.target);
+
+      if (!clickedInsideDrawer && !clickedOpenButton) {
+        closeMenu();
+      }
+    });
+
+    // Close the drawer after selecting a navigation link.
+    mobileDrawer.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", closeMenu);
+    });
+
+
+    // ==========================================
+    // PRODUCT IMAGE GALLERY
+    // ==========================================
+
+    const productImages = [
+      "./images/image-product-1.jpg",
+      "./images/image-product-2.jpg",
+      "./images/image-product-3.jpg",
+      "./images/image-product-4.jpg"
+    ];
+
+    let currentImageIndex = 0;
+
+    const mainImage = document.getElementById("main-product-image");
+    const mainImageButton = document.getElementById("main-image-button");
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightbox-image");
+    const lightboxContent = document.getElementById("lightbox-content");
+    const lightboxClose = document.getElementById("lightbox-close");
+
+    const desktopThumbnails = document.querySelectorAll(
+      "#desktop-thumbnails .thumbnail"
+    );
+
+    const lightboxThumbnails = document.querySelectorAll(
+      "#lightbox-thumbnails .thumbnail"
+    );
+
+    const mobilePrev = document.getElementById("mobile-prev");
+    const mobileNext = document.getElementById("mobile-next");
+
+    const lightboxPrev = document.getElementById("lightbox-prev");
+    const lightboxNext = document.getElementById("lightbox-next");
+
+    // Update the main image and synchronize both thumbnail groups.
+    function updateImage(index) {
+      currentImageIndex =
+        (index + productImages.length) % productImages.length;
+
+      mainImage.src = productImages[currentImageIndex];
+      lightboxImage.src = productImages[currentImageIndex];
+
+      // Update desktop thumbnail selection.
+      desktopThumbnails.forEach((thumbnail, i) => {
+        const isActive = i === currentImageIndex;
+
+        thumbnail.classList.toggle("active", isActive);
+        thumbnail.setAttribute("aria-pressed", String(isActive));
+      });
+
+      // Update lightbox thumbnail selection.
+      lightboxThumbnails.forEach((thumbnail, i) => {
+        const isActive = i === currentImageIndex;
+
+        thumbnail.classList.toggle("active", isActive);
+        thumbnail.setAttribute("aria-pressed", String(isActive));
+      });
+    }
+
+    // Desktop thumbnail click events.
+    desktopThumbnails.forEach(thumbnail => {
+      thumbnail.addEventListener("click", () => {
+        updateImage(Number(thumbnail.dataset.index));
+      });
+    });
+
+    // Lightbox thumbnail click events.
+    lightboxThumbnails.forEach(thumbnail => {
+      thumbnail.addEventListener("click", () => {
+        updateImage(Number(thumbnail.dataset.index));
+      });
+    });
+
+    // Navigate to the next image.
+    function nextImage() {
+      updateImage(currentImageIndex + 1);
+    }
+
+    // Navigate to the previous image.
+    function previousImage() {
+      updateImage(currentImageIndex - 1);
+    }
+
+    mobileNext.addEventListener("click", nextImage);
+    mobilePrev.addEventListener("click", previousImage);
+
+
+    // ==========================================
+    // DESKTOP LIGHTBOX
+    // ==========================================
+
+    // Only allow the lightbox to open on desktop.
+    function openLightbox() {
+      if (window.innerWidth < 768) return;
+
+      lightbox.classList.add("open");
+      lightbox.removeAttribute("inert");
+      lightbox.setAttribute("aria-hidden", "false");
+
+      document.body.classList.add("no-scroll");
+
+      lightboxClose.focus();
+    }
+
+    // Close the lightbox and return focus to the main image.
+    function closeLightbox() {
+      if (!lightbox.classList.contains("open")) return;
+
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("inert", "");
+      lightbox.setAttribute("aria-hidden", "true");
+
+      document.body.classList.remove("no-scroll");
+
+      mainImageButton.focus();
+    }
+
+    mainImageButton.addEventListener("click", openLightbox);
+    lightboxClose.addEventListener("click", closeLightbox);
+
+    // Clicking the dark background closes the lightbox.
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    // Prevent clicks inside the lightbox content from closing it.
+    lightboxContent.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    lightboxNext.addEventListener("click", nextImage);
+    lightboxPrev.addEventListener("click", previousImage);
+
+
+    // ==========================================
+    // MOBILE SWIPE SUPPORT
+    // ==========================================
+
+    let touchStartX = 0;
+
+    const galleryContainer = document.getElementById("mobile-gallery");
+
+    // Record the horizontal starting position of a touch.
+    galleryContainer.addEventListener("touchstart", (event) => {
+      touchStartX = event.changedTouches[0].screenX;
+    }, { passive: true });
+
+    // Change images when the user swipes left or right.
+    galleryContainer.addEventListener("touchend", (event) => {
+      const touchEndX = event.changedTouches[0].screenX;
+      const swipeDistance = touchEndX - touchStartX;
+
+      // Ignore short movements that are not intentional swipes.
+      if (Math.abs(swipeDistance) < 50) return;
+
+      if (swipeDistance < 0) {
+        nextImage();
+      } else {
+        previousImage();
+      }
+    }, { passive: true });
+
+
+    // ==========================================
+    // QUANTITY SELECTOR
+    // ==========================================
+
+    let quantity = 0;
+
+    const quantityDisplay = document.getElementById("quantity");
+    const quantityMinus = document.getElementById("quantity-minus");
+    const quantityPlus = document.getElementById("quantity-plus");
+
+    // Update the displayed quantity.
+    function updateQuantity() {
+      quantityDisplay.textContent = quantity;
+    }
+
+    // Increase quantity.
+    quantityPlus.addEventListener("click", () => {
+      quantity++;
+      updateQuantity();
+    });
+
+    // Decrease quantity without allowing negative values.
+    quantityMinus.addEventListener("click", () => {
+      if (quantity > 0) {
+        quantity--;
+      }
+
+      updateQuantity();
+    });
+
+
+    // ==========================================
+    // SHOPPING CART
+    // ==========================================
+
+    const addToCartButton = document.getElementById("add-to-cart");
+    const cartToggle = document.getElementById("cart-toggle");
+    const cartPopup = document.getElementById("cart-popup");
+    const cartContainer = document.getElementById("cart-container");
+
+    const cartCount = document.getElementById("cart-count");
+    const cartEmpty = document.getElementById("cart-empty");
+    const cartFilled = document.getElementById("cart-filled");
+
+    const cartItemQuantity = document.getElementById("cart-item-quantity");
+    const cartItemTotal = document.getElementById("cart-item-total");
+
+    const cartDelete = document.getElementById("cart-delete");
+    const checkoutButton = document.getElementById("checkout-button");
+
+    // Product price and current cart quantity.
+    const productPrice = 125;
+    let cartQuantity = 0;
+
+    // Format numeric amounts as currency.
+    function formatPrice(amount) {
+      return "$" + amount.toFixed(2);
+    }
+
+    // Refresh all cart information after a cart change.
+    function updateCart() {
+      const total = cartQuantity * productPrice;
+
+      // Update the cart badge.
+      cartCount.textContent = cartQuantity;
+      cartCount.classList.toggle("hidden", cartQuantity === 0);
+      cartCount.classList.toggle("flex", cartQuantity > 0);
+
+      // Show the correct empty or filled cart content.
+      cartEmpty.classList.toggle("hidden", cartQuantity > 0);
+      cartFilled.classList.toggle("hidden", cartQuantity === 0);
+
+      // Update product quantity and total price.
+      cartItemQuantity.textContent = cartQuantity;
+      cartItemTotal.textContent = formatPrice(total);
+    }
+
+    // Open the cart popup.
+    function openCart() {
+      cartPopup.classList.add("open");
+      cartPopup.setAttribute("aria-hidden", "false");
+      cartToggle.setAttribute("aria-expanded", "true");
+    }
+
+    // Close the cart popup.
+    function closeCart() {
+      cartPopup.classList.remove("open");
+      cartPopup.setAttribute("aria-hidden", "true");
+      cartToggle.setAttribute("aria-expanded", "false");
+    }
+
+    // Toggle the cart popup when the cart icon is clicked.
+    cartToggle.addEventListener("click", () => {
+      if (cartPopup.classList.contains("open")) {
+        closeCart();
+      } else {
+        openCart();
+      }
+    });
+
+    // Close the cart when the user clicks outside it.
+    document.addEventListener("click", (event) => {
+      if (
+        !cartContainer.contains(event.target) &&
+        !addToCartButton.contains(event.target)
+      ) {
+        closeCart();
+      }
+    });
+
+    // Add the selected product quantity to the cart.
+    addToCartButton.addEventListener("click", () => {
+      if (quantity === 0) {
+        alert("Please select at least one item.");
+        return;
+      }
+
+      cartQuantity += quantity;
+
+      updateCart();
+      openCart();
+    });
+
+    // Remove the product from the cart.
+    cartDelete.addEventListener("click", () => {
+      cartQuantity = 0;
+      updateCart();
+    });
+
+    // Checkout placeholder.
+    checkoutButton.addEventListener("click", () => {
+      if (cartQuantity > 0) {
+        alert("Thank you! Checkout is not connected yet.");
+      }
+    });
+
+
+    // ==========================================
+    // KEYBOARD CONTROLS
+    // ==========================================
+
+    document.addEventListener("keydown", (event) => {
+
+      // Escape closes the mobile navigation drawer.
+      if (event.key === "Escape" && isMenuOpen()) {
+        closeMenu();
+        return;
+      }
+
+      // Escape closes the cart popup.
+      if (
+        event.key === "Escape" &&
+        cartPopup.classList.contains("open")
+      ) {
+        closeCart();
+      }
+
+      // Lightbox keyboard navigation.
+      if (lightbox.classList.contains("open")) {
+
+        if (event.key === "Escape") {
+          closeLightbox();
+        }
+
+        if (event.key === "ArrowRight") {
+          nextImage();
+        }
+
+        if (event.key === "ArrowLeft") {
+          previousImage();
+        }
+      }
+    });
+
+
+    // ==========================================
+    // RESPONSIVE WINDOW CHANGES
+    // ==========================================
+
+    const desktopMediaQuery = window.matchMedia("(min-width: 768px)");
+
+    desktopMediaQuery.addEventListener("change", (event) => {
+
+      // Close the mobile drawer when switching to desktop.
+      if (event.matches) {
+        closeMenu();
+      } else {
+        // Close the lightbox when switching to mobile.
+        closeLightbox();
+      }
+    });
+
+
+    // ==========================================
+    // INITIAL PAGE STATE
+    // ==========================================
+
+    // Initialize the cart, gallery, and quantity selector.
+    updateCart();
+    updateImage(0);
+    updateQuantity();
+
+  </script>
+
+</body>
+</html>
