@@ -5,21 +5,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <meta
+    name="description"
+    content="Shop the Fall Limited Edition Sneakers from Sneaker Company."
+  >
+
   <title>Frontend Mentor | E-commerce Product Page</title>
 
-  <!-- Google Fonts: Kumbh Sans -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap"
+    rel="stylesheet"
+  >
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS CDN: convenient for this single-file project.
+       For production, compile Tailwind into a local CSS file. -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
             kumbh: ['"Kumbh Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#ff7d1a',
+              light: '#ffab6a',
+              pale: '#ffede0',
+            },
           },
         },
       },
@@ -31,7 +48,15 @@
        GLOBAL STYLES
     ========================================== */
 
-    * {
+    :root {
+      --orange: #ff7d1a;
+      --orange-light: #ffab6a;
+      --orange-pale: #ffede0;
+    }
+
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
     }
 
@@ -41,26 +66,35 @@
     }
 
     body {
-      font-family: 'Kumbh Sans', sans-serif;
       min-height: 100vh;
       min-height: 100svh;
       margin: 0;
       overflow-x: hidden;
+      font-family: "Kumbh Sans", sans-serif;
     }
 
     button {
       cursor: pointer;
-      font-family: inherit;
+      font: inherit;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
     }
 
     img {
+      display: block;
       max-width: 100%;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 4px;
     }
 
     /* ==========================================
        PAGE LAYOUT
-       The page can grow naturally when content
-       needs more height, especially on mobile.
     ========================================== */
 
     .page-wrapper {
@@ -78,8 +112,8 @@
 
     .site-main {
       flex: 1 0 auto;
-      min-width: 0;
       width: 100%;
+      min-width: 0;
     }
 
     /* ==========================================
@@ -88,22 +122,23 @@
 
     .nav-link {
       position: relative;
-      transition: color 0.3s ease;
+      transition: color 0.2s ease;
     }
 
     .nav-link:hover {
-      color: #ff7d1a;
+      color: var(--orange);
     }
 
     .nav-link::after {
-      content: "";
       position: absolute;
-      left: 0;
+      right: 0;
       bottom: -30px;
-      width: 0;
+      left: 0;
       height: 4px;
-      background-color: #ff7d1a;
-      transition: width 0.3s ease;
+      width: 0;
+      content: "";
+      background: var(--orange);
+      transition: width 0.2s ease;
     }
 
     .nav-link:hover::after {
@@ -111,31 +146,37 @@
     }
 
     /* ==========================================
-       MOBILE NAVIGATION DRAWER
+       NATIVE MOBILE NAVIGATION DIALOG
     ========================================== */
 
     #mobile-drawer {
-      transform: translateX(-100%);
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: min(288px, 80vw);
+      height: 100%;
+      height: 100dvh;
+      max-height: none;
+      margin: 0;
+      padding: 28px;
+      border: 0;
+      background: white;
+      box-shadow: 8px 0 30px rgba(0, 0, 0, 0.12);
+      transform: translateX(-105%);
       transition: transform 0.3s ease-in-out;
     }
 
-    #mobile-drawer.open {
+    #mobile-drawer[open] {
       transform: translateX(0);
     }
 
-    #mobile-overlay {
+    #mobile-drawer::backdrop {
+      background: rgba(0, 0, 0, 0.6);
       opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition:
-        opacity 0.3s ease,
-        visibility 0.3s ease;
+      transition: opacity 0.3s ease;
     }
 
-    #mobile-overlay.open {
+    #mobile-drawer[open]::backdrop {
       opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
     }
 
     /* ==========================================
@@ -144,8 +185,8 @@
 
     .product-gallery {
       width: min(100%, 500px, calc((100svh - 210px) / 1.25));
-      margin-inline: auto;
       min-width: 0;
+      margin-inline: auto;
     }
 
     .main-product-image {
@@ -156,13 +197,12 @@
       border-radius: 16px;
     }
 
-    /* Gallery thumbnail buttons */
     .thumbnail {
       position: relative;
       display: block;
-      overflow: hidden;
       width: 100%;
       aspect-ratio: 1 / 1;
+      overflow: hidden;
       border: 2px solid transparent;
       border-radius: 12px;
       transition: border-color 0.2s ease;
@@ -176,18 +216,16 @@
       transition: opacity 0.2s ease;
     }
 
-    /* Active thumbnail orange border */
     .thumbnail.active {
-      border-color: #ff7d1a;
+      border-color: var(--orange);
     }
 
-    /* Pale overlay for active and hovered thumbnails */
     .thumbnail::after {
-      content: "";
       position: absolute;
       inset: 0;
-      background: rgba(255, 255, 255, 0);
+      content: "";
       pointer-events: none;
+      background: rgba(255, 255, 255, 0);
       transition: background-color 0.2s ease;
     }
 
@@ -200,23 +238,91 @@
     }
 
     .thumbnail:focus-visible {
-      outline: 3px solid #ff7d1a;
+      outline: 3px solid var(--orange);
       outline-offset: 3px;
     }
 
     /* ==========================================
-       SHOPPING CART POPUP
+       GALLERY ARROWS
+    ========================================== */
+
+    .gallery-arrow {
+      position: absolute;
+      top: 50%;
+      z-index: 10;
+      display: flex;
+      width: 48px;
+      height: 48px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: white;
+      transform: translateY(-50%);
+      transition: background-color 0.2s ease;
+    }
+
+    .gallery-arrow:hover {
+      background: var(--orange);
+    }
+
+    .gallery-arrow:hover img {
+      filter: brightness(0) invert(1);
+    }
+
+    /* ==========================================
+       NATIVE LIGHTBOX DIALOG
+    ========================================== */
+
+    #lightbox {
+      width: min(100%, 520px);
+      max-width: 520px;
+      max-height: 100%;
+      margin: auto;
+      padding: 24px;
+      overflow: visible;
+      border: 0;
+      background: transparent;
+      color: white;
+    }
+
+    #lightbox::backdrop {
+      background: rgba(0, 0, 0, 0.82);
+    }
+
+    .lightbox-content {
+      width: min(100%, 430px);
+      margin-inline: auto;
+    }
+
+    .lightbox-image {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    #lightbox-close {
+      transition: transform 0.2s ease;
+    }
+
+    #lightbox-close:hover {
+      transform: scale(1.15);
+    }
+
+    /* ==========================================
+       CART POPUP
     ========================================== */
 
     #cart-popup {
       position: absolute;
       top: calc(100% + 14px);
       right: 0;
-      width: min(360px, calc(100vw - 24px));
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.22);
       z-index: 60;
+      width: min(360px, calc(100vw - 24px));
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.22);
 
       opacity: 0;
       visibility: hidden;
@@ -239,85 +345,14 @@
     .cart-item-image {
       width: 50px;
       height: 50px;
-      object-fit: cover;
-      border-radius: 5px;
       flex-shrink: 0;
+      border-radius: 5px;
+      object-fit: cover;
     }
 
     .cart-delete-button img {
       width: 16px;
       height: 18px;
-    }
-
-    /* ==========================================
-       GALLERY NAVIGATION ARROWS
-    ========================================== */
-
-    .gallery-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background-color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      transition: background-color 0.2s ease;
-    }
-
-    .gallery-arrow:hover {
-      background-color: #ff7d1a;
-    }
-
-    .gallery-arrow:hover img {
-      filter: brightness(0) invert(1);
-    }
-
-    /* ==========================================
-       DESKTOP LIGHTBOX
-    ========================================== */
-
-    #lightbox {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition:
-        opacity 0.25s ease,
-        visibility 0.25s ease;
-    }
-
-    #lightbox.open {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    .lightbox-content {
-      width: min(100%, 430px, calc((100svh - 220px) / 1.22));
-    }
-
-    .lightbox-image {
-      display: block;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-
-    #lightbox-close {
-      transition: transform 0.2s ease;
-    }
-
-    #lightbox-close:hover {
-      transform: scale(1.15);
-    }
-
-    /* Prevent background scrolling when a popup is open */
-    body.no-scroll {
-      overflow: hidden;
     }
 
     /* ==========================================
@@ -331,14 +366,14 @@
 
       .site-main {
         display: flex;
-        align-items: center;
         min-height: 0;
+        align-items: center;
         padding-block: clamp(16px, 3vh, 32px);
       }
 
       .product-section {
-        width: 100%;
         display: grid;
+        width: 100%;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         align-items: center;
         gap: clamp(24px, 5vw, 72px);
@@ -380,15 +415,12 @@
       }
 
       .product-details h1 {
+        margin-bottom: 16px;
         font-size: clamp(28px, 3vw, 40px);
         line-height: 1.12;
-        margin-bottom: 16px;
       }
 
-      .product-details .description {
-        margin-bottom: 18px;
-      }
-
+      .product-details .description,
       .product-details .price-section {
         margin-bottom: 18px;
       }
@@ -405,14 +437,12 @@
         overflow-x: hidden;
       }
 
-      /* Allow the page to expand beyond the screen height */
       .page-wrapper {
         min-height: 100vh;
         min-height: 100svh;
         height: auto;
       }
 
-      /* Mobile header */
       .site-header nav {
         padding-inline: 20px;
       }
@@ -421,31 +451,26 @@
         height: 68px;
       }
 
-      /* Reset desktop flex layout */
       .site-main {
         display: block;
-        flex: 1 0 auto;
-        min-height: auto;
         width: 100%;
+        min-height: auto;
         padding: 0;
       }
 
-      /* Stack gallery and product information vertically */
       .product-section {
         display: flex;
-        flex-direction: column;
         width: 100%;
+        flex-direction: column;
         gap: 0;
       }
 
-      /* Make gallery use the full mobile width */
       .product-gallery {
         width: 100%;
         max-width: none;
         margin: 0;
       }
 
-      /* Shorter responsive image to reduce unnecessary vertical space */
       .main-product-image {
         width: 100%;
         height: clamp(230px, 75vw, 340px);
@@ -465,18 +490,15 @@
         width: 100%;
       }
 
-      /* Mobile gallery arrows */
       .gallery-arrow {
         width: 42px;
         height: 42px;
       }
 
-      /* Hide desktop thumbnail row on mobile */
       .desktop-thumbnails {
         display: none !important;
       }
 
-      /* Product information spacing */
       .product-details {
         width: 100%;
         min-width: 0;
@@ -484,24 +506,23 @@
       }
 
       .product-details .company-name {
+        margin-bottom: 12px;
         font-size: 12px;
         letter-spacing: 2px;
-        margin-bottom: 12px;
       }
 
       .product-details h1 {
+        margin-bottom: 16px;
         font-size: clamp(26px, 7vw, 34px);
         line-height: 1.12;
-        margin-bottom: 16px;
       }
 
       .product-details .description {
+        margin-bottom: 20px;
         font-size: 15px;
         line-height: 1.65;
-        margin-bottom: 20px;
       }
 
-      /* Price information */
       .product-details .price-section {
         margin-bottom: 20px;
       }
@@ -514,7 +535,6 @@
         margin-top: 0;
       }
 
-      /* Quantity and add-to-cart controls */
       .product-details > div:last-child {
         gap: 12px;
       }
@@ -528,18 +548,16 @@
         min-height: 54px;
       }
 
-      /* Footer stays in normal document flow */
       .site-footer {
         padding: 18px 12px;
         line-height: 1.8;
       }
 
-      /* Mobile cart popup */
       #cart-popup {
         position: fixed;
         top: 78px;
-        left: 12px;
         right: 12px;
+        left: 12px;
         width: auto;
         max-width: 420px;
         max-height: calc(100svh - 92px);
@@ -547,9 +565,8 @@
         overflow-y: auto;
       }
 
-      /* Lightbox sizing */
-      .lightbox-content {
-        width: min(100%, 430px);
+      #lightbox {
+        display: none;
       }
     }
 
@@ -597,20 +614,15 @@
     }
 
     /* ==========================================
-       ACCESSIBILITY
+       REDUCED MOTION
     ========================================== */
-
-    button:focus-visible,
-    a:focus-visible {
-      outline: 3px solid #ff7d1a;
-      outline-offset: 4px;
-    }
 
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
       *::after {
         scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
       }
     }
@@ -625,9 +637,9 @@
          HEADER AND DESKTOP NAVIGATION
     ========================================= -->
 
-    <header class="site-header bg-white relative z-30">
-      <nav class="max-w-7xl mx-auto px-6 lg:px-10">
-        <div class="flex items-center justify-between h-20 border-b border-gray-200">
+    <header class="site-header relative z-30 bg-white">
+      <nav class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div class="flex h-20 items-center justify-between border-b border-gray-200">
 
           <div class="flex items-center gap-6 md:gap-10 lg:gap-14">
 
@@ -637,14 +649,14 @@
               type="button"
               aria-label="Open navigation menu"
               aria-controls="mobile-drawer"
-              aria-expanded="false"
-              class="md:hidden flex items-center justify-center"
+              aria-haspopup="dialog"
+              class="flex items-center justify-center md:hidden"
             >
-              <img src="./images/icon-menu.svg" alt="" class="w-5 h-5">
+              <img src="./images/icon-menu.svg" alt="" class="h-5 w-5">
             </button>
 
             <!-- Company logo -->
-            <a href="#" class="flex-shrink-0">
+            <a href="#" class="flex-shrink-0" aria-label="Sneaker Company home">
               <img
                 src="./images/logo.svg"
                 alt="Sneaker Company"
@@ -652,8 +664,8 @@
               >
             </a>
 
-            <!-- Desktop navigation links -->
-            <ul class="hidden md:flex items-center gap-5 lg:gap-8 h-20">
+            <!-- Desktop navigation -->
+            <ul class="hidden h-20 items-center gap-5 md:flex lg:gap-8">
               <li><a href="#" class="nav-link text-gray-500">Collections</a></li>
               <li><a href="#" class="nav-link text-gray-500">Men</a></li>
               <li><a href="#" class="nav-link text-gray-500">Women</a></li>
@@ -668,21 +680,21 @@
 
             <div id="cart-container" class="relative">
 
-              <!-- Cart toggle button -->
+              <!-- Cart toggle -->
               <button
                 id="cart-toggle"
                 type="button"
                 aria-label="Open shopping cart"
                 aria-controls="cart-popup"
                 aria-expanded="false"
-                class="relative hover:opacity-70 transition"
+                class="relative transition hover:opacity-70"
               >
-                <img src="./images/icon-cart.svg" alt="" class="w-6 h-6">
+                <img src="./images/icon-cart.svg" alt="" class="h-6 w-6">
 
                 <!-- Cart quantity badge -->
                 <span
                   id="cart-count"
-                  class="hidden absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-orange-500 text-white text-xs font-bold items-center justify-center"
+                  class="absolute -right-2 -top-2 hidden h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-xs font-bold text-white"
                   aria-live="polite"
                 >0</span>
               </button>
@@ -692,32 +704,31 @@
                 id="cart-popup"
                 aria-label="Shopping cart"
                 aria-hidden="true"
+                inert
               >
-                <h2 class="px-6 py-5 text-gray-900 font-bold">Cart</h2>
+                <h2 class="px-6 py-5 font-bold text-gray-900">Cart</h2>
 
                 <div class="h-px bg-gray-200"></div>
 
                 <div
                   id="cart-content"
-                  class="p-6 min-h-40 flex flex-col justify-center"
+                  class="flex min-h-40 flex-col justify-center p-6"
                 >
 
-                  <!-- Empty cart message -->
                   <p
                     id="cart-empty"
-                    class="text-gray-500 font-bold text-center"
+                    class="text-center font-bold text-gray-500"
                   >
                     Your cart is empty.
                   </p>
 
-                  <!-- Cart product details -->
                   <div id="cart-filled" class="hidden">
 
                     <div class="flex items-center gap-4">
 
                       <img
-                        src="./images/image-product-1.jpg"
-                        alt="Fall Limited Edition Sneakers"
+                        src="./images/image-product-1-thumbnail.jpg"
+                        alt=""
                         class="cart-item-image"
                       >
 
@@ -735,7 +746,7 @@
                         </p>
                       </div>
 
-                      <!-- Remove product from cart -->
+                      <!-- Remove product -->
                       <button
                         id="cart-delete"
                         type="button"
@@ -747,11 +758,11 @@
 
                     </div>
 
-                    <!-- Checkout button -->
+                    <!-- Checkout -->
                     <button
                       id="checkout-button"
                       type="button"
-                      class="mt-6 w-full rounded-lg bg-orange-500 hover:bg-orange-400 py-4 font-bold text-black transition"
+                      class="mt-6 w-full rounded-lg bg-brand py-4 font-bold text-black shadow-lg shadow-orange-200 transition hover:bg-brand-light"
                     >
                       Checkout
                     </button>
@@ -766,12 +777,12 @@
             <button
               type="button"
               aria-label="User profile"
-              class="rounded-full border-2 border-orange-500 hover:border-orange-600 transition"
+              class="rounded-full border-2 border-brand transition hover:border-orange-600"
             >
               <img
                 src="./images/image-avatar.png"
-                alt="User avatar"
-                class="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover"
+                alt=""
+                class="h-10 w-10 rounded-full object-cover md:h-11 md:w-11"
               >
             </button>
 
@@ -780,69 +791,51 @@
       </nav>
     </header>
 
-
     <!-- ========================================
-         MOBILE NAVIGATION OVERLAY
+         NATIVE MOBILE NAVIGATION DIALOG
     ========================================= -->
 
-    <div
-      id="mobile-overlay"
-      class="fixed inset-0 bg-black/60 z-40 md:hidden"
-      aria-hidden="true"
-    ></div>
-
-
-    <!-- ========================================
-         MOBILE NAVIGATION DRAWER
-    ========================================= -->
-
-    <aside
+    <dialog
       id="mobile-drawer"
-      class="fixed top-0 left-0 h-full w-72 max-w-[80%] bg-white z-50 p-7 shadow-xl md:hidden"
       aria-label="Mobile navigation"
-      aria-hidden="true"
-      inert
     >
-
       <button
         id="menu-close"
         type="button"
         aria-label="Close navigation menu"
         class="mb-12"
       >
-        <img src="./images/icon-close.svg" alt="" class="w-5 h-5">
+        <img src="./images/icon-close.svg" alt="" class="h-5 w-5">
       </button>
 
-      <!-- Mobile navigation links -->
-      <ul class="flex flex-col gap-7 font-bold text-lg">
-        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Collections</a></li>
-        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Men</a></li>
-        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Women</a></li>
-        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">About</a></li>
-        <li><a href="#" class="text-gray-900 hover:text-orange-500 transition">Contact</a></li>
+      <ul class="flex flex-col gap-7 text-lg font-bold">
+        <li><a href="#" class="text-gray-900 transition hover:text-brand">Collections</a></li>
+        <li><a href="#" class="text-gray-900 transition hover:text-brand">Men</a></li>
+        <li><a href="#" class="text-gray-900 transition hover:text-brand">Women</a></li>
+        <li><a href="#" class="text-gray-900 transition hover:text-brand">About</a></li>
+        <li><a href="#" class="text-gray-900 transition hover:text-brand">Contact</a></li>
       </ul>
-
-    </aside>
-
+    </dialog>
 
     <!-- ========================================
          MAIN PRODUCT SECTION
     ========================================= -->
 
-    <main class="site-main max-w-7xl mx-auto w-full px-0 md:px-6 lg:px-10">
+    <main class="site-main mx-auto w-full max-w-7xl px-0 md:px-6 lg:px-10">
 
       <section class="product-section">
 
         <!-- PRODUCT IMAGE GALLERY -->
         <div class="product-gallery">
 
-          <div id="mobile-gallery" class="mobile-gallery relative group">
+          <div id="mobile-gallery" class="mobile-gallery group relative">
 
             <!-- Main product image -->
             <button
               id="main-image-button"
               type="button"
               aria-label="Open product image gallery"
+              aria-haspopup="dialog"
               class="block w-full md:cursor-zoom-in"
             >
               <img
@@ -853,32 +846,33 @@
               >
             </button>
 
-            <!-- Mobile previous image button -->
+            <!-- Mobile previous image -->
             <button
               id="mobile-prev"
               type="button"
               aria-label="Previous image"
               class="gallery-arrow left-4 md:hidden"
             >
-              <img src="./images/icon-previous.svg" alt="" class="w-3 h-4">
+              <img src="./images/icon-previous.svg" alt="" class="h-4 w-3">
             </button>
 
-            <!-- Mobile next image button -->
+            <!-- Mobile next image -->
             <button
               id="mobile-next"
               type="button"
               aria-label="Next image"
               class="gallery-arrow right-4 md:hidden"
             >
-              <img src="./images/icon-next.svg" alt="" class="w-3 h-4">
+              <img src="./images/icon-next.svg" alt="" class="h-4 w-3">
             </button>
 
           </div>
 
-          <!-- Desktop product thumbnails -->
+          <!-- Desktop thumbnails -->
           <div
             id="desktop-thumbnails"
-            class="desktop-thumbnails hidden md:grid grid-cols-4 gap-4 mt-5"
+            class="desktop-thumbnails mt-5 hidden grid-cols-4 gap-4 md:grid"
+            aria-label="Product image selection"
           >
 
             <button
@@ -888,7 +882,7 @@
               aria-label="Show product image 1"
               aria-pressed="true"
             >
-              <img src="./images/image-product-1.jpg" alt="Sneaker thumbnail 1">
+              <img src="./images/image-product-1-thumbnail.jpg" alt="">
             </button>
 
             <button
@@ -898,7 +892,7 @@
               aria-label="Show product image 2"
               aria-pressed="false"
             >
-              <img src="./images/image-product-2.jpg" alt="Sneaker thumbnail 2">
+              <img src="./images/image-product-2-thumbnail.jpg" alt="">
             </button>
 
             <button
@@ -908,7 +902,7 @@
               aria-label="Show product image 3"
               aria-pressed="false"
             >
-              <img src="./images/image-product-3.jpg" alt="Sneaker thumbnail 3">
+              <img src="./images/image-product-3-thumbnail.jpg" alt="">
             </button>
 
             <button
@@ -918,114 +912,109 @@
               aria-label="Show product image 4"
               aria-pressed="false"
             >
-              <img src="./images/image-product-4.jpg" alt="Sneaker thumbnail 4">
+              <img src="./images/image-product-4-thumbnail.jpg" alt="">
             </button>
 
           </div>
         </div>
 
-
         <!-- PRODUCT DETAILS -->
-        <div class="product-details px-6 md:px-0 py-8 md:py-0">
+        <div class="product-details px-6 py-8 md:px-0 md:py-0">
 
-          <p class="company-name text-gray-500 font-bold uppercase tracking-widest text-sm mb-5">
+          <p class="company-name mb-5 text-sm font-bold uppercase tracking-widest text-gray-500">
             Sneaker Company
           </p>
 
-          <h1 class="text-gray-900 text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+          <h1 class="mb-6 text-3xl font-bold leading-tight text-gray-900 md:text-4xl lg:text-5xl">
             Fall Limited Edition Sneakers
           </h1>
 
-          <p class="description text-gray-500 leading-relaxed mb-7">
+          <p class="description mb-7 leading-relaxed text-gray-500">
             These low-profile sneakers are your perfect casual wear companion.
             Featuring a durable rubber outer sole, they’ll withstand everything
             the weather can offer.
           </p>
 
-          <!-- Product price and discount -->
-          <div class="price-section flex md:flex-col items-center md:items-start justify-between mb-7">
+          <!-- Price and discount -->
+          <div class="price-section mb-7 flex items-center justify-between md:flex-col md:items-start">
 
             <div class="flex items-center gap-4">
               <span class="text-3xl font-bold text-gray-900">$125.00</span>
 
-              <span class="bg-black text-white font-bold px-2 py-1 rounded-md">
+              <span class="rounded-md bg-black px-2 py-1 font-bold text-white">
                 50%
               </span>
             </div>
 
-            <span class="text-gray-500 line-through font-bold mt-0 md:mt-2">
+            <span class="mt-0 font-bold text-gray-500 line-through md:mt-2">
               $250.00
             </span>
 
           </div>
 
-          <!-- Quantity selector and add-to-cart controls -->
-          <div class="flex flex-col sm:flex-row gap-4">
+          <!-- Quantity and cart controls -->
+          <div class="flex flex-col gap-4 sm:flex-row">
 
             <!-- Quantity selector -->
-            <div class="flex items-center justify-between bg-gray-100 rounded-xl px-4 py-4 sm:w-2/5">
+            <div class="flex items-center justify-between rounded-xl bg-gray-100 px-4 py-4 sm:w-2/5">
 
               <button
                 id="quantity-minus"
                 type="button"
                 aria-label="Decrease quantity"
-                class="text-orange-500 text-2xl font-bold hover:opacity-60"
-              >-</button>
+                class="px-2 text-2xl font-bold text-brand hover:opacity-60"
+              >−</button>
 
               <span
                 id="quantity"
                 class="font-bold text-gray-900"
                 aria-live="polite"
+                aria-atomic="true"
               >0</span>
 
               <button
                 id="quantity-plus"
                 type="button"
                 aria-label="Increase quantity"
-                class="text-orange-500 text-2xl font-bold hover:opacity-60"
+                class="px-2 text-2xl font-bold text-brand hover:opacity-60"
               >+</button>
 
             </div>
 
-            <!-- Add-to-cart button -->
+            <!-- Add to cart -->
             <button
               id="add-to-cart"
               type="button"
-              class="flex items-center justify-center gap-4 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-xl py-4 px-6 sm:flex-1 transition shadow-lg shadow-orange-200"
+              disabled
+              class="flex flex-1 items-center justify-center gap-4 rounded-xl bg-brand px-6 py-4 font-bold text-black shadow-lg shadow-orange-200 transition hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-50"
             >
               <img
                 src="./images/icon-cart.svg"
                 alt=""
-                class="w-5 h-5 brightness-0"
+                class="h-5 w-5 brightness-0"
               >
               Add to cart
             </button>
 
           </div>
+
         </div>
 
       </section>
     </main>
 
-
     <!-- ========================================
-         DESKTOP PRODUCT IMAGE LIGHTBOX
+         NATIVE DESKTOP LIGHTBOX DIALOG
     ========================================= -->
 
-    <div
+    <dialog
       id="lightbox"
-      class="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-6"
-      aria-hidden="true"
-      role="dialog"
-      aria-modal="true"
       aria-label="Product image gallery"
-      inert
     >
-
       <div id="lightbox-content" class="lightbox-content">
 
-        <!-- Lightbox close button -->
-        <div class="flex justify-end mb-4">
+        <!-- Close button -->
+        <div class="mb-4 flex justify-end">
           <button
             id="lightbox-close"
             type="button"
@@ -1034,12 +1023,12 @@
             <img
               src="./images/icon-close.svg"
               alt=""
-              class="w-6 h-6 brightness-0 invert"
+              class="h-6 w-6 brightness-0 invert"
             >
           </button>
         </div>
 
-        <!-- Large lightbox image and navigation -->
+        <!-- Main lightbox image -->
         <div class="relative">
 
           <img
@@ -1055,7 +1044,7 @@
             aria-label="Previous image"
             class="gallery-arrow -left-6"
           >
-            <img src="./images/icon-previous.svg" alt="" class="w-3 h-4">
+            <img src="./images/icon-previous.svg" alt="" class="h-4 w-3">
           </button>
 
           <button
@@ -1064,7 +1053,7 @@
             aria-label="Next image"
             class="gallery-arrow -right-6"
           >
-            <img src="./images/icon-next.svg" alt="" class="w-3 h-4">
+            <img src="./images/icon-next.svg" alt="" class="h-4 w-3">
           </button>
 
         </div>
@@ -1072,7 +1061,8 @@
         <!-- Lightbox thumbnails -->
         <div
           id="lightbox-thumbnails"
-          class="grid grid-cols-4 gap-4 mt-6 px-3"
+          class="mt-6 grid grid-cols-4 gap-4 px-3"
+          aria-label="Lightbox image selection"
         >
 
           <button
@@ -1082,7 +1072,7 @@
             aria-label="Show product image 1"
             aria-pressed="true"
           >
-            <img src="./images/image-product-1.jpg" alt="Sneaker thumbnail 1">
+            <img src="./images/image-product-1-thumbnail.jpg" alt="">
           </button>
 
           <button
@@ -1092,7 +1082,7 @@
             aria-label="Show product image 2"
             aria-pressed="false"
           >
-            <img src="./images/image-product-2.jpg" alt="Sneaker thumbnail 2">
+            <img src="./images/image-product-2-thumbnail.jpg" alt="">
           </button>
 
           <button
@@ -1102,7 +1092,7 @@
             aria-label="Show product image 3"
             aria-pressed="false"
           >
-            <img src="./images/image-product-3.jpg" alt="Sneaker thumbnail 3">
+            <img src="./images/image-product-3-thumbnail.jpg" alt="">
           </button>
 
           <button
@@ -1112,26 +1102,25 @@
             aria-label="Show product image 4"
             aria-pressed="false"
           >
-            <img src="./images/image-product-4.jpg" alt="Sneaker thumbnail 4">
+            <img src="./images/image-product-4-thumbnail.jpg" alt="">
           </button>
 
         </div>
 
       </div>
-    </div>
-
+    </dialog>
 
     <!-- ========================================
          FOOTER
     ========================================= -->
 
-    <footer class="site-footer text-center text-xs text-gray-500 py-4">
+    <footer class="site-footer py-4 text-center text-xs text-gray-500">
 
       Challenge by
 
       <a
         href="https://www.frontendmentor.io?ref=challenge"
-        class="text-blue-600 underline hover:text-orange-500 transition"
+        class="text-blue-600 underline transition hover:text-brand"
         target="_blank"
         rel="noopener noreferrer"
       >Frontend Mentor</a>.
@@ -1140,7 +1129,7 @@
 
       <a
         href="https://www.linkedin.com/in/heinn-htet-zan-040794291/"
-        class="text-blue-600 underline hover:text-orange-500 transition"
+        class="text-blue-600 underline transition hover:text-brand"
         target="_blank"
         rel="noopener noreferrer"
       >Heinn Htet Zan</a>.
@@ -1149,81 +1138,71 @@
 
   </div>
 
-
   <!-- ==========================================
        JAVASCRIPT
-       Handles navigation, gallery, quantity,
-       cart interactions, and keyboard controls.
   =========================================== -->
 
   <script>
+    "use strict";
+
     // ==========================================
-    // MOBILE NAVIGATION DRAWER
+    // SHARED DOM REFERENCES
+    // ==========================================
+
+    const desktopMediaQuery = window.matchMedia("(min-width: 768px)");
+
+    // ==========================================
+    // MOBILE NAVIGATION
     // ==========================================
 
     const menuOpen = document.getElementById("menu-open");
     const menuClose = document.getElementById("menu-close");
     const mobileDrawer = document.getElementById("mobile-drawer");
-    const mobileOverlay = document.getElementById("mobile-overlay");
 
-    // Check whether the mobile drawer is currently open.
-    function isMenuOpen() {
-      return mobileDrawer.classList.contains("open");
-    }
-
-    // Open the drawer and prevent background scrolling.
     function openMenu() {
-      mobileDrawer.classList.add("open");
-      mobileOverlay.classList.add("open");
+      if (desktopMediaQuery.matches || mobileDrawer.open) return;
 
-      mobileDrawer.removeAttribute("inert");
-      mobileDrawer.setAttribute("aria-hidden", "false");
-
-      menuOpen.setAttribute("aria-expanded", "true");
-
-      document.body.classList.add("no-scroll");
-
-      menuClose.focus();
+      mobileDrawer.showModal();
     }
 
-    // Close the drawer and restore focus to the menu button.
     function closeMenu() {
-      if (!isMenuOpen()) return;
-
-      mobileDrawer.classList.remove("open");
-      mobileOverlay.classList.remove("open");
-
-      mobileDrawer.setAttribute("inert", "");
-      mobileDrawer.setAttribute("aria-hidden", "true");
-
-      menuOpen.setAttribute("aria-expanded", "false");
-
-      document.body.classList.remove("no-scroll");
-
-      menuOpen.focus();
+      if (mobileDrawer.open) {
+        mobileDrawer.close();
+      }
     }
 
     menuOpen.addEventListener("click", openMenu);
     menuClose.addEventListener("click", closeMenu);
-    mobileOverlay.addEventListener("click", closeMenu);
 
-    // Close the drawer when the user clicks outside it.
-    document.addEventListener("click", (event) => {
-      if (!isMenuOpen()) return;
-
-      const clickedInsideDrawer = mobileDrawer.contains(event.target);
-      const clickedOpenButton = menuOpen.contains(event.target);
-
-      if (!clickedInsideDrawer && !clickedOpenButton) {
+    // Close when clicking the backdrop.
+    mobileDrawer.addEventListener("click", (event) => {
+      if (event.target === mobileDrawer) {
         closeMenu();
       }
     });
 
-    // Close the drawer after selecting a navigation link.
-    mobileDrawer.querySelectorAll("a").forEach(link => {
-      link.addEventListener("click", closeMenu);
+    // Return focus to the menu button after closing.
+    mobileDrawer.addEventListener("close", () => {
+      menuOpen.focus();
     });
 
+    // Focus the close button when the dialog opens.
+    mobileDrawer.addEventListener("close", () => {
+      menuOpen.setAttribute("aria-expanded", "false");
+    });
+
+    mobileDrawer.addEventListener("click", (event) => {
+      if (event.target.closest("a")) {
+        closeMenu();
+      }
+    });
+
+    mobileDrawer.addEventListener("toggle", () => {
+      menuOpen.setAttribute(
+        "aria-expanded",
+        String(mobileDrawer.open)
+      );
+    });
 
     // ==========================================
     // PRODUCT IMAGE GALLERY
@@ -1236,23 +1215,12 @@
       "./images/image-product-4.jpg"
     ];
 
-    let currentImageIndex = 0;
-
     const mainImage = document.getElementById("main-product-image");
     const mainImageButton = document.getElementById("main-image-button");
 
     const lightbox = document.getElementById("lightbox");
     const lightboxImage = document.getElementById("lightbox-image");
-    const lightboxContent = document.getElementById("lightbox-content");
     const lightboxClose = document.getElementById("lightbox-close");
-
-    const desktopThumbnails = document.querySelectorAll(
-      "#desktop-thumbnails .thumbnail"
-    );
-
-    const lightboxThumbnails = document.querySelectorAll(
-      "#lightbox-thumbnails .thumbnail"
-    );
 
     const mobilePrev = document.getElementById("mobile-prev");
     const mobileNext = document.getElementById("mobile-next");
@@ -1260,136 +1228,144 @@
     const lightboxPrev = document.getElementById("lightbox-prev");
     const lightboxNext = document.getElementById("lightbox-next");
 
-    // Update the main image and synchronize both thumbnail groups.
+    const thumbnailGroups = [
+      document.querySelectorAll("#desktop-thumbnails .thumbnail"),
+      document.querySelectorAll("#lightbox-thumbnails .thumbnail")
+    ];
+
+    let currentImageIndex = 0;
+
+    // Keep all gallery images and thumbnails synchronized.
     function updateImage(index) {
       currentImageIndex =
         (index + productImages.length) % productImages.length;
 
-      mainImage.src = productImages[currentImageIndex];
-      lightboxImage.src = productImages[currentImageIndex];
+      const currentImage = productImages[currentImageIndex];
 
-      // Update desktop thumbnail selection.
-      desktopThumbnails.forEach((thumbnail, i) => {
-        const isActive = i === currentImageIndex;
+      mainImage.src = currentImage;
+      lightboxImage.src = currentImage;
 
-        thumbnail.classList.toggle("active", isActive);
-        thumbnail.setAttribute("aria-pressed", String(isActive));
-      });
+      thumbnailGroups.forEach((group) => {
+        group.forEach((thumbnail) => {
+          const isActive =
+            Number(thumbnail.dataset.index) === currentImageIndex;
 
-      // Update lightbox thumbnail selection.
-      lightboxThumbnails.forEach((thumbnail, i) => {
-        const isActive = i === currentImageIndex;
-
-        thumbnail.classList.toggle("active", isActive);
-        thumbnail.setAttribute("aria-pressed", String(isActive));
+          thumbnail.classList.toggle("active", isActive);
+          thumbnail.setAttribute("aria-pressed", String(isActive));
+        });
       });
     }
 
-    // Desktop thumbnail click events.
-    desktopThumbnails.forEach(thumbnail => {
-      thumbnail.addEventListener("click", () => {
-        updateImage(Number(thumbnail.dataset.index));
-      });
-    });
-
-    // Lightbox thumbnail click events.
-    lightboxThumbnails.forEach(thumbnail => {
-      thumbnail.addEventListener("click", () => {
-        updateImage(Number(thumbnail.dataset.index));
-      });
-    });
-
-    // Navigate to the next image.
     function nextImage() {
       updateImage(currentImageIndex + 1);
     }
 
-    // Navigate to the previous image.
     function previousImage() {
       updateImage(currentImageIndex - 1);
     }
 
+    // Attach thumbnail events to both groups.
+    thumbnailGroups.forEach((group) => {
+      group.forEach((thumbnail) => {
+        thumbnail.addEventListener("click", () => {
+          updateImage(Number(thumbnail.dataset.index));
+        });
+      });
+    });
+
     mobileNext.addEventListener("click", nextImage);
     mobilePrev.addEventListener("click", previousImage);
 
+    lightboxNext.addEventListener("click", nextImage);
+    lightboxPrev.addEventListener("click", previousImage);
 
     // ==========================================
     // DESKTOP LIGHTBOX
     // ==========================================
 
-    // Only allow the lightbox to open on desktop.
-    function openLightbox() {
-      if (window.innerWidth < 768) return;
+    function updateLightboxButton() {
+      const canOpenLightbox = desktopMediaQuery.matches;
 
-      lightbox.classList.add("open");
-      lightbox.removeAttribute("inert");
-      lightbox.setAttribute("aria-hidden", "false");
+      // The button does nothing on mobile, so disable it there.
+      mainImageButton.disabled = !canOpenLightbox;
 
-      document.body.classList.add("no-scroll");
-
-      lightboxClose.focus();
+      mainImageButton.setAttribute(
+        "aria-label",
+        canOpenLightbox
+          ? "Open product image gallery"
+          : "Product image gallery is available on desktop"
+      );
     }
 
-    // Close the lightbox and return focus to the main image.
+    function openLightbox() {
+      if (!desktopMediaQuery.matches || lightbox.open) return;
+
+      lightbox.showModal();
+    }
+
     function closeLightbox() {
-      if (!lightbox.classList.contains("open")) return;
-
-      lightbox.classList.remove("open");
-      lightbox.setAttribute("inert", "");
-      lightbox.setAttribute("aria-hidden", "true");
-
-      document.body.classList.remove("no-scroll");
-
-      mainImageButton.focus();
+      if (lightbox.open) {
+        lightbox.close();
+      }
     }
 
     mainImageButton.addEventListener("click", openLightbox);
     lightboxClose.addEventListener("click", closeLightbox);
 
-    // Clicking the dark background closes the lightbox.
+    // Clicking the backdrop closes the lightbox.
     lightbox.addEventListener("click", (event) => {
       if (event.target === lightbox) {
         closeLightbox();
       }
     });
 
-    // Prevent clicks inside the lightbox content from closing it.
-    lightboxContent.addEventListener("click", (event) => {
-      event.stopPropagation();
+    // Return focus to the main image button after closing.
+    lightbox.addEventListener("close", () => {
+      if (desktopMediaQuery.matches) {
+        mainImageButton.focus();
+      }
     });
-
-    lightboxNext.addEventListener("click", nextImage);
-    lightboxPrev.addEventListener("click", previousImage);
-
 
     // ==========================================
     // MOBILE SWIPE SUPPORT
     // ==========================================
 
-    let touchStartX = 0;
-
     const galleryContainer = document.getElementById("mobile-gallery");
 
-    // Record the horizontal starting position of a touch.
-    galleryContainer.addEventListener("touchstart", (event) => {
-      touchStartX = event.changedTouches[0].screenX;
-    }, { passive: true });
+    let touchStartX = 0;
+    let touchStartY = 0;
 
-    // Change images when the user swipes left or right.
-    galleryContainer.addEventListener("touchend", (event) => {
-      const touchEndX = event.changedTouches[0].screenX;
-      const swipeDistance = touchEndX - touchStartX;
+    galleryContainer.addEventListener(
+      "touchstart",
+      (event) => {
+        const touch = event.changedTouches[0];
 
-      // Ignore short movements that are not intentional swipes.
-      if (Math.abs(swipeDistance) < 50) return;
+        touchStartX = touch.screenX;
+        touchStartY = touch.screenY;
+      },
+      { passive: true }
+    );
 
-      if (swipeDistance < 0) {
-        nextImage();
-      } else {
-        previousImage();
-      }
-    }, { passive: true });
+    galleryContainer.addEventListener(
+      "touchend",
+      (event) => {
+        const touch = event.changedTouches[0];
 
+        const distanceX = touch.screenX - touchStartX;
+        const distanceY = touch.screenY - touchStartY;
+
+        // Ignore vertical scrolling and small movements.
+        if (Math.abs(distanceX) < 50) return;
+        if (Math.abs(distanceX) < Math.abs(distanceY)) return;
+
+        if (distanceX < 0) {
+          nextImage();
+        } else {
+          previousImage();
+        }
+      },
+      { passive: true }
+    );
 
     // ==========================================
     // QUANTITY SELECTOR
@@ -1401,32 +1377,31 @@
     const quantityMinus = document.getElementById("quantity-minus");
     const quantityPlus = document.getElementById("quantity-plus");
 
-    // Update the displayed quantity.
+    const addToCartButton = document.getElementById("add-to-cart");
+
     function updateQuantity() {
       quantityDisplay.textContent = quantity;
+
+      // Prevent adding an empty quantity to the cart.
+      addToCartButton.disabled = quantity === 0;
     }
 
-    // Increase quantity.
     quantityPlus.addEventListener("click", () => {
       quantity++;
       updateQuantity();
     });
 
-    // Decrease quantity without allowing negative values.
     quantityMinus.addEventListener("click", () => {
       if (quantity > 0) {
         quantity--;
+        updateQuantity();
       }
-
-      updateQuantity();
     });
-
 
     // ==========================================
     // SHOPPING CART
     // ==========================================
 
-    const addToCartButton = document.getElementById("add-to-cart");
     const cartToggle = document.getElementById("cart-toggle");
     const cartPopup = document.getElementById("cart-popup");
     const cartContainer = document.getElementById("cart-container");
@@ -1441,57 +1416,59 @@
     const cartDelete = document.getElementById("cart-delete");
     const checkoutButton = document.getElementById("checkout-button");
 
-    // Product price and current cart quantity.
     const productPrice = 125;
+
     let cartQuantity = 0;
 
-    // Format numeric amounts as currency.
     function formatPrice(amount) {
       return "$" + amount.toFixed(2);
     }
 
-    // Refresh all cart information after a cart change.
     function updateCart() {
       const total = cartQuantity * productPrice;
 
-      // Update the cart badge.
+      // Cart badge.
       cartCount.textContent = cartQuantity;
+
       cartCount.classList.toggle("hidden", cartQuantity === 0);
       cartCount.classList.toggle("flex", cartQuantity > 0);
 
-      // Show the correct empty or filled cart content.
+      // Empty or filled cart.
       cartEmpty.classList.toggle("hidden", cartQuantity > 0);
       cartFilled.classList.toggle("hidden", cartQuantity === 0);
 
-      // Update product quantity and total price.
+      // Product details.
       cartItemQuantity.textContent = cartQuantity;
       cartItemTotal.textContent = formatPrice(total);
     }
 
-    // Open the cart popup.
     function openCart() {
       cartPopup.classList.add("open");
+      cartPopup.removeAttribute("inert");
       cartPopup.setAttribute("aria-hidden", "false");
+
       cartToggle.setAttribute("aria-expanded", "true");
     }
 
-    // Close the cart popup.
     function closeCart() {
       cartPopup.classList.remove("open");
+      cartPopup.setAttribute("inert", "");
       cartPopup.setAttribute("aria-hidden", "true");
+
       cartToggle.setAttribute("aria-expanded", "false");
     }
 
-    // Toggle the cart popup when the cart icon is clicked.
-    cartToggle.addEventListener("click", () => {
+    function toggleCart() {
       if (cartPopup.classList.contains("open")) {
         closeCart();
       } else {
         openCart();
       }
-    });
+    }
 
-    // Close the cart when the user clicks outside it.
+    cartToggle.addEventListener("click", toggleCart);
+
+    // Close the cart when clicking outside it.
     document.addEventListener("click", (event) => {
       if (
         !cartContainer.contains(event.target) &&
@@ -1501,12 +1478,9 @@
       }
     });
 
-    // Add the selected product quantity to the cart.
+    // Add the selected quantity to the cart.
     addToCartButton.addEventListener("click", () => {
-      if (quantity === 0) {
-        alert("Please select at least one item.");
-        return;
-      }
+      if (quantity === 0) return;
 
       cartQuantity += quantity;
 
@@ -1527,52 +1501,43 @@
       }
     });
 
-
     // ==========================================
     // KEYBOARD CONTROLS
     // ==========================================
 
     document.addEventListener("keydown", (event) => {
 
-      // Escape closes the mobile navigation drawer.
-      if (event.key === "Escape" && isMenuOpen()) {
-        closeMenu();
-        return;
-      }
+      // Native dialogs handle Escape automatically.
+      // Only handle cart and lightbox image navigation here.
 
-      // Escape closes the cart popup.
-      if (
-        event.key === "Escape" &&
-        cartPopup.classList.contains("open")
-      ) {
-        closeCart();
-      }
-
-      // Lightbox keyboard navigation.
-      if (lightbox.classList.contains("open")) {
-
-        if (event.key === "Escape") {
-          closeLightbox();
+      if (event.key === "Escape") {
+        if (cartPopup.classList.contains("open")) {
+          closeCart();
         }
+      }
 
+      // Lightbox arrow-key navigation.
+      if (lightbox.open) {
         if (event.key === "ArrowRight") {
+          event.preventDefault();
           nextImage();
         }
 
         if (event.key === "ArrowLeft") {
+          event.preventDefault();
           previousImage();
         }
       }
     });
 
-
     // ==========================================
     // RESPONSIVE WINDOW CHANGES
     // ==========================================
 
-    const desktopMediaQuery = window.matchMedia("(min-width: 768px)");
-
     desktopMediaQuery.addEventListener("change", (event) => {
+
+      // Update whether the main image can open the lightbox.
+      updateLightboxButton();
 
       // Close the mobile drawer when switching to desktop.
       if (event.matches) {
@@ -1583,15 +1548,14 @@
       }
     });
 
-
     // ==========================================
     // INITIAL PAGE STATE
     // ==========================================
 
-    // Initialize the cart, gallery, and quantity selector.
-    updateCart();
     updateImage(0);
     updateQuantity();
+    updateCart();
+    updateLightboxButton();
 
   </script>
 
